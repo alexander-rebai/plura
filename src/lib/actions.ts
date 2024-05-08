@@ -1,7 +1,8 @@
 "use server";
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { Agency, Plan, User } from "@prisma/client";
+import { createId } from "@paralleldrive/cuid2";
+import { Agency, Plan, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "./db";
 
@@ -16,10 +17,10 @@ export const getAuthUserDetails = async () => {
     include: {
       Agency: {
         include: {
-          SidebarOption: true,
-          SubAccount: {
+          SidebarOptions: true,
+          SubAccounts: {
             include: {
-              SidebarOption: true,
+              SidebarOptions: true,
             },
           },
         },
@@ -48,7 +49,7 @@ export const saveActivityLogsNotification = async ({
     const response = await db.user.findFirst({
       where: {
         Agency: {
-          SubAccount: {
+          SubAccounts: {
             some: { id: subaccountId },
           },
         },
@@ -266,7 +267,7 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
         connect: { email: agency.companyEmail },
       },
       ...agency,
-      SidebarOption: {
+      SidebarOptions: {
         create: [
           {
             name: "Dashboard",
@@ -304,4 +305,105 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
   });
 
   return agencyDetails;
+};
+
+export const upsertSubAccount = async (subAccount: SubAccount) => {
+  if (!subAccount.companyEmail) return null;
+
+  const agencyOwner = await db.user.findFirst({
+    where: {
+      Agency: {
+        id: subAccount.agencyId,
+      },
+      role: "AGENCY_OWNER",
+    },
+  });
+
+  if (!agencyOwner) return console.error("Could not create subaccount.");
+
+  const permissionId = createId();
+
+  const response = await db.subAccount.upsert({
+    where: { id: subAccount.id },
+    update: subAccount,
+    create: {
+      ...subAccount,
+      Permissions: {
+        create: {
+          access: true,
+          email: agencyOwner.email,
+          id: permissionId,
+        },
+        connect: {
+          subAccountId: subAccount.id,
+          id: permissionId,
+        },
+      },
+      Pipelines: {
+        create: { name: "Lead Cycle" },
+      },
+      SidebarOptions: {
+        create: [
+          {
+            name: "Launchpad",
+            icon: "clipboardIcon",
+            link: `/subaccount/${subAccount.id}/launchpad`,
+          },
+          {
+            name: "Settings",
+            icon: "settings",
+            link: `/subaccount/${subAccount.id}/settings`,
+          },
+          {
+            name: "Funnels",
+            icon: "pipelines",
+            link: `/subaccount/${subAccount.id}/funnels`,
+          },
+          {
+            name: "Media",
+            icon: "database",
+            link: `/subaccount/${subAccount.id}/media`,
+          },
+          {
+            name: "Automations",
+            icon: "chip",
+            link: `/subaccount/${subAccount.id}/automations`,
+          },
+          {
+            name: "Pipelines",
+            icon: "flag",
+            link: `/subaccount/${subAccount.id}/pipelines`,
+          },
+          {
+            name: "Contacts",
+            icon: "person",
+            link: `/subaccount/${subAccount.id}/contacts`,
+          },
+          {
+            name: "Dashboard",
+            icon: "category",
+            link: `/subaccount/${subAccount.id}`,
+          },
+        ],
+      },
+    },
+  });
+
+  return response;
+};
+
+export const getNotificationAndUser = async (agencyId: string) => {
+  const response = await db.notification.findMany({
+    where: {
+      agencyId,
+    },
+    include: {
+      User: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return response;
 };

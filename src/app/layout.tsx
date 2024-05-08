@@ -1,7 +1,9 @@
+import { Toaster } from "@/components/ui/toaster";
+import { ModalProvider } from "@/providers/modal-provider";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import { ThemeProvider } from "../providers/theme-provider";
 import "./globals.css";
-import { ThemeProvider } from "./providers/theme-provider";
 
 const inter = DM_Sans({ subsets: ["latin"] });
 
@@ -24,7 +26,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ModalProvider>
+            <Toaster />
+            {children}
+          </ModalProvider>
         </ThemeProvider>
       </body>
     </html>

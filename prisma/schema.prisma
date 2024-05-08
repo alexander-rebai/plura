@@ -66,14 +66,14 @@ model User {
   role         Role           @default(SUBACCOUNT_USER)
   agencyId     String?
   Agency       Agency?        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  Permissions  Permissions[]
+  Permissions  Permission[]
   Ticket       Ticket[]
   Notification Notification[]
 
   @@index([agencyId])
 }
 
-model Permissions {
+model Permission {
   id           String     @id @default(cuid())
   email        String
   User         User       @relation(fields: [email], references: [email], onDelete: Cascade)
@@ -103,12 +103,12 @@ model Agency {
   users            User[]
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
-  SubAccount       SubAccount[]
-  SidebarOption    AgencySidebarOption[]
-  Invitation       Invitation[]
-  Notification     Notification[]
+  SubAccounts      SubAccount[]
+  SidebarOptions   AgencySidebarOption[]
+  Invitations      Invitation[]
+  Notifications    Notification[]
   Subscription     Subscription?
-  AddOns           AddOns[]
+  AddOns           AddOn[]
 }
 
 model SubAccount {
@@ -128,16 +128,16 @@ model SubAccount {
   country          String
   agencyId         String
   Agency           Agency                    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  SidebarOption    SubAccountSidebarOption[]
-  Permissions      Permissions[]
+  SidebarOptions   SubAccountSidebarOption[]
+  Permissions      Permission[]
   Funnels          Funnel[]
   Media            Media[]
-  Contact          Contact[]
-  Trigger          Trigger[]
-  Automation       Automation[]
-  Pipeline         Pipeline[]
+  Contacts         Contact[]
+  Triggers         Trigger[]
+  Automations      Automation[]
+  Pipelines        Pipeline[]
   Tags             Tag[]
-  Notification     Notification[]
+  Notifications    Notification[]
 
   @@index([agencyId])
 }
@@ -161,7 +161,7 @@ model Pipeline {
   name         String
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  Lane         Lane[]
+  Lanes        Lane[]
   SubAccount   SubAccount @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
   subAccountId String
 
@@ -231,7 +231,7 @@ model Automation {
   Trigger            Trigger?             @relation(fields: [triggerId], references: [id], onDelete: Cascade)
   subAccountId       String
   Subaccount         SubAccount           @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-  Action             Action[]
+  Actions            Action[]
   AutomationInstance AutomationInstance[]
 
   @@index([triggerId])
@@ -276,7 +276,7 @@ model Contact {
   subAccountId String
 
   Subaccount SubAccount @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-  Ticket     Ticket[]
+  Tickets    Ticket[]
 
   @@index([subAccountId])
 }
@@ -307,7 +307,7 @@ model Funnel {
   SubAccount    SubAccount   @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
   FunnelPages   FunnelPage[]
   liveProducts  String?      @default("[]")
-  ClassName     ClassName[]
+  ClassNames    ClassName[]
 
   @@index([subAccountId])
 }
@@ -427,7 +427,7 @@ model Subscription {
   @@index([customerId])
 }
 
-model AddOns {
+model AddOn {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
