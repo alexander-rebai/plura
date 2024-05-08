@@ -400,10 +400,7 @@ const AgencyDetails = ({ data }: Props) => {
           </Form>
 
           {data?.id && (
-            <div className="flex flex-row items-center justify-between rounded-lg border border-destructive gap-4 p-4 mt-4">
-              <div>
-                <div>Danger Zone</div>
-              </div>
+            <div className="flex flex-col md:flex-row items-center justify-between rounded-lg border border-destructive gap-4 p-4 mt-4">
               <div className="text-muted-foreground">
                 Deleting your agency cannot be undone. This will also delete all
                 subaccounts and all data related to your subaccounts.

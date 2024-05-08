@@ -407,3 +407,63 @@ export const getNotificationAndUser = async (agencyId: string) => {
 
   return response;
 };
+
+export const getUserPermissions = async (userId: string) => {
+  const response = await db.user.findUnique({
+    where: { id: userId },
+    select: { Permissions: { include: { SubAccount: true } } },
+  });
+
+  return response;
+};
+
+export const updateUser = async (user: Partial<User>) => {
+  const response = await db.user.update({
+    where: {
+      email: user.email,
+    },
+    data: {
+      ...user,
+    },
+  });
+
+  await clerkClient.users.updateUserMetadata(response.id, {
+    privateMetadata: {
+      role: user.role || "SUBACCOUNT_USER",
+    },
+  });
+
+  return response;
+};
+
+export const changeUserPermissions = async ({
+  permissionId,
+  userEmail,
+  subAccountId,
+  value,
+}: {
+  permissionId?: string;
+  userEmail: string;
+  subAccountId: string;
+  value: boolean;
+}) => {
+  try {
+    const response = await db.permission.upsert({
+      where: {
+        id: permissionId,
+      },
+      update: {
+        access: value,
+      },
+      create: {
+        access: value,
+        email: userEmail,
+        subAccountId,
+      },
+    });
+
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+};
