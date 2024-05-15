@@ -1,7 +1,10 @@
 import BlurPage from "@/components/global/blur-page";
 import InfoBar, { NotificationWithUser } from "@/components/global/info-bar";
 import Sidebar from "@/components/sidebar/sidebar";
-import { getNotificationAndUser, verifyAcceptInvitation } from "@/lib/actions";
+import {
+  getNotificationAndUser,
+  verifyAndAcceptInvitation,
+} from "@/lib/actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -14,7 +17,7 @@ type Props = {
 };
 
 const Layout = async ({ children, params }: Props) => {
-  const agencyId = await verifyAcceptInvitation();
+  const agencyId = await verifyAndAcceptInvitation();
   const user = await currentUser();
 
   if (!user || !agencyId) redirect("/");

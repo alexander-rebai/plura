@@ -45,7 +45,7 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
     if (!modal) return;
 
     if (fetchData) {
-      await fetchData();
+      setData({ ...data, ...(await fetchData()) } || {});
     }
 
     setShowingModal(modal);

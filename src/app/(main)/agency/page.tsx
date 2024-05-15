@@ -1,5 +1,5 @@
 import AgencyDetails from "@/components/forms/agency-details";
-import { getAuthUserDetails, verifyAcceptInvitation } from "@/lib/actions";
+import { getAuthUserDetails, verifyAndAcceptInvitation } from "@/lib/actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { Plan } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -13,7 +13,7 @@ export default async function AgencyPage({
     code: string;
   };
 }) {
-  const agencyId = await verifyAcceptInvitation();
+  const agencyId = await verifyAndAcceptInvitation();
 
   const user = await getAuthUserDetails();
 

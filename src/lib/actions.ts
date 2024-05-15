@@ -2,9 +2,10 @@
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { createId } from "@paralleldrive/cuid2";
-import { Agency, Plan, SubAccount, User } from "@prisma/client";
+import { Agency, Plan, Role, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "./db";
+import { MediaCreateType } from "./types";
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser();
@@ -141,7 +142,7 @@ const createTeamUser = async ({
   return response;
 };
 
-export const verifyAcceptInvitation = async () => {
+export const verifyAndAcceptInvitation = async () => {
   const user = await currentUser();
 
   if (!user) redirect("/agency/sign-in");
@@ -482,6 +483,94 @@ export const deleteSubAccount = async (subaccountId: string) => {
   const response = await db.subAccount.delete({
     where: {
       id: subaccountId,
+    },
+  });
+
+  return response;
+};
+
+export const deleteUser = async (userId: string) => {
+  const response = await db.user.delete({
+    where: {
+      id: userId,
+    },
+  });
+
+  return response;
+};
+
+export const getUser = async (userId: string) => {
+  const response = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  return response;
+};
+
+export const sendInvitation = async (
+  role: Role,
+  email: string,
+  agencyId: string
+) => {
+  const response = await db.invitation.create({
+    data: {
+      email,
+      agencyId,
+      role,
+    },
+  });
+
+  try {
+    await clerkClient.invitations.createInvitation({
+      emailAddress: email,
+      redirectUrl: process.env.NEXT_PUBLIC_URL,
+      publicMetadata: {
+        throughInvitation: true,
+        role,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Could not send invitation");
+  }
+
+  return response;
+};
+
+export const getMedia = async (subaccountId: string) => {
+  const response = await db.media.findMany({
+    where: {
+      subAccountId: subaccountId,
+    },
+  });
+
+  return response;
+};
+
+export const createMedia = async ({
+  subaccountId,
+  media,
+}: {
+  subaccountId: string;
+  media: MediaCreateType;
+}) => {
+  const response = await db.media.create({
+    data: {
+      link: media.link,
+      name: media.name,
+      subAccountId: subaccountId,
+    },
+  });
+
+  return response;
+};
+
+export const deleteMedia = async (mediaId: string) => {
+  const response = await db.media.delete({
+    where: {
+      id: mediaId,
     },
   });
 
