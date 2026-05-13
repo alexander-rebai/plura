@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.29.12",
+    "@clerk/nextjs": "^6.9.0",
     "@clerk/themes": "^1.7.12",
     "@hookform/resolvers": "^3.3.4",
     "@paralleldrive/cuid2": "^2.2.2",
@@ -51,27 +51,27 @@
     "embla-carousel-react": "^8.0.2",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.371.0",
-    "next": "15.5.15",
+    "next": "15.5.18",
     "next-themes": "^0.3.0",
     "prisma": "^5.12.1",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
-    "react-hook-form": "^7.51.3",
+    "react-hook-form": "^7.54.0",
     "react-resizable-panels": "^2.0.17",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.9.0",
     "vaul": "^0.9.0",
-    "zod": "^3.22.4"
+    "zod": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.2",
+    "eslint-config-next": "15.5.18",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
